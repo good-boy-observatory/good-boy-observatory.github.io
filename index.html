@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#05060f">
+<title>The Good Boy Observatory</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="collage" aria-hidden="true"></div>
+<div id="veil" aria-hidden="true"></div>
+
+<main>
+  <header>
+    <p class="eyebrow">Est. under a very old star</p>
+    <h1>The Good Boy Observatory</h1>
+    <p class="sub">Point the instrument at the sky and an elderly dog will run past it in circles.</p>
+  </header>
+
+  <section id="stage" class="stage" aria-live="polite">
+    <div class="plate" id="plate">
+      <div class="plate-inner">
+        <video id="clip" playsinline muted loop autoplay preload="auto"></video>
+        <div class="empty" id="empty">
+          <svg viewBox="0 0 120 120" class="lens" aria-hidden="true">
+            <circle cx="60" cy="60" r="46" />
+            <circle cx="60" cy="60" r="30" />
+            <path d="M60 6v14M60 100v14M6 60h14M100 60h14" />
+          </svg>
+          <p>The lens is uncovered.<br>Nothing has run past yet.</p>
+        </div>
+        <div class="grain" aria-hidden="true"></div>
+      </div>
+      <figcaption id="caption" class="caption" hidden>
+        <span class="name" id="cap-name"></span>
+        <span class="meta" id="cap-meta"></span>
+        <span class="note" id="cap-note" hidden></span>
+      </figcaption>
+    </div>
+  </section>
+
+  <button id="summon" class="summon" type="button">
+    <span class="summon-label">Observe a good boy</span>
+    <span class="summon-glow" aria-hidden="true"></span>
+  </button>
+
+  <p class="hint" id="hint">Press it as many times as you need.</p>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/deck.js"></script>
+<script src="js/names.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/nebula.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+/* The Good Boy Observatory */
+
+:root {
+  --ink:        #f2eee6;
+  --ink-soft:   rgba(242, 238, 230, 0.62);
+  --ink-faint:  rgba(242, 238, 230, 0.38);
+  --brass:      #e8c88a;
+  --brass-deep: #b98f45;
+  --frame:      rgba(255, 255, 255, 0.16);
+  --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans:  ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #03040a;
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ---- background ---------------------------------------------------------- */
+
+#sky, #collage, #veil {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#sky { z-index: 0; }
+
+#collage {
+  z-index: 1;
+  overflow: hidden;
+}
+
+#collage.drifting {
+  animation: drift 90s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: scale(1.02) translate3d(-0.8%, -0.6%, 0); }
+  to   { transform: scale(1.06) translate3d(0.8%, 0.6%, 0); }
+}
+
+.plate-bg {
+  position: absolute;
+  display: block;
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.13),
+    0 0 0 3px rgba(2, 3, 8, 0.9),
+    0 12px 34px rgba(0, 0, 0, 0.7);
+}
+
+/* keeps the type readable no matter which nebula lands behind it */
+#veil {
+  z-index: 2;
+  background:
+    radial-gradient(115% 85% at 50% 40%, rgba(3, 4, 10, 0.72) 0%, rgba(3, 4, 10, 0.4) 42%, rgba(3, 4, 10, 0.14) 70%, rgba(3, 4, 10, 0.34) 100%),
+    linear-gradient(to bottom, rgba(3, 4, 10, 0.42), rgba(3, 4, 10, 0.08) 32%, rgba(3, 4, 10, 0.6));
+}
+
+/* ---- layout -------------------------------------------------------------- */
+
+main {
+  position: relative;
+  z-index: 3;
+  min-height: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: clamp(20px, 3.4vh, 42px) 20px calc(22px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;   /* sit in the middle of the sky, not at the top */
+  gap: clamp(12px, 2.2vh, 20px);
+  text-align: center;
+}
+
+header { max-width: 34ch; }
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(29px, 6vw, 42px);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 34px rgba(160, 190, 255, 0.28), 0 2px 18px rgba(0, 0, 0, 0.7);
+}
+
+.sub {
+  margin: 11px 0 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ---- the plate ----------------------------------------------------------- */
+
+.stage { width: 100%; max-width: 500px; }
+
+.plate {
+  position: relative;
+  padding: 10px 10px 0;
+  border-radius: 16px;
+  border: 1px solid var(--frame);
+  background: rgba(8, 10, 22, 0.5);
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+.plate.turning { opacity: 0.45; transform: scale(0.992); }
+
+.plate.arriving .plate-inner > video { animation: arrive 520ms cubic-bezier(0.2, 0.7, 0.3, 1); }
+
+@keyframes arrive {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: none; }
+}
+
+.plate-inner {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  /* the frame never grows past what leaves room for the button — on a bad day
+     nobody should have to scroll to press it again */
+  max-height: min(40vh, 340px);
+  /* when max-height clamps it, the 4:3 ratio derives the width instead — so
+     centre it, and it reads as a smaller photograph mounted on the same card */
+  margin-inline: auto;
+  border-radius: 9px;
+  transition: max-height 300ms ease;
+  overflow: hidden;
+  background: #04050c;
+  display: grid;
+  place-items: center;
+}
+
+#clip {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #04050c;
+}
+
+.plate:not(.loaded) #clip { display: none; }
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px;
+  color: var(--ink-faint);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.empty p { margin: 0; }
+
+/* an explicit display value beats the hidden attribute, so say it again */
+.empty[hidden], .caption[hidden], .note[hidden] { display: none; }
+
+.lens {
+  width: 78px;
+  height: 78px;
+  fill: none;
+  stroke: rgba(232, 200, 138, 0.5);
+  stroke-width: 2;
+  stroke-linecap: round;
+  animation: breathe 5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* a whisper of film grain so the clip sits in the frame instead of on it */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 13px 6px 14px;
+  text-align: center;
+}
+
+.caption .name {
+  font-family: var(--serif);
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.caption .meta {
+  font-size: 11.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: rgba(232, 200, 138, 0.78);
+}
+
+/* When a note is showing, the frame gives up height so the note and the button
+   both stay on screen. Long notes take more; the dog can afford it. */
+.note-showing .plate-inner { max-height: min(26vh, 225px); }
+.note-long .plate-inner    { max-height: min(19vh, 165px); }
+
+.note-long .caption .note {
+  max-width: 46ch;
+  font-size: 14px;
+  line-height: 1.44;
+}
+
+/* a long note outranks the masthead: the note is the reason she is here */
+@media (max-height: 900px) {
+  .note-long .sub,
+  .note-long .eyebrow { display: none; }
+  .note-long h1 { font-size: clamp(24px, 4.6vw, 33px); }
+  .note-long .hint { display: none; }
+}
+
+/* a line from him, when one comes */
+.caption .note {
+  display: block;
+  margin: 9px auto 1px;
+  max-width: 34ch;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(246, 226, 180, 0.92);
+  animation: note-in 700ms ease both;
+}
+
+.caption .note::before {
+  content: "✦";
+  display: block;
+  margin-bottom: 5px;
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(232, 200, 138, 0.55);
+}
+
+@keyframes note-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- the button ---------------------------------------------------------- */
+
+.summon {
+  position: relative;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  padding: 17px 40px;
+  border-radius: 999px;
+  font-family: var(--serif);
+  font-size: 19px;
+  letter-spacing: 0.015em;
+  color: #241a09;
+  background: linear-gradient(180deg, #f6e2b4 0%, var(--brass) 46%, var(--brass-deep) 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 210, 0.35),
+    0 14px 34px rgba(232, 200, 138, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 140ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+
+.summon:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.summon:active { transform: translateY(1px) scale(0.99); }
+
+.summon:disabled { cursor: default; filter: saturate(0.8) brightness(0.94); }
+
+.summon:focus-visible {
+  outline: 2px solid #cfe3ff;
+  outline-offset: 4px;
+}
+
+/* the slow halo, like something warm is on behind it */
+.summon-glow {
+  position: absolute;
+  inset: -14px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(232, 200, 138, 0.3), transparent 72%);
+  animation: pulse 4.6s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.96); }
+  50%      { opacity: 0.9;  transform: scale(1.04); }
+}
+
+.hint {
+  margin: -6px 0 0;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+/* a phone has height to spare, so a note there costs the dog much less */
+@media (max-width: 560px) and (min-height: 680px) {
+  .note-showing .plate-inner { max-height: min(34vh, 300px); }
+  .note-long .plate-inner    { max-height: min(29vh, 255px); }
+  .note-long .sub,
+  .note-long .eyebrow,
+  .note-long .hint { display: revert; }
+  .note-long h1 { font-size: clamp(29px, 6vw, 42px); }
+}
+
+/* ---- smaller screens ------------------------------------------------------ */
+
+@media (max-width: 480px) {
+  main { gap: 16px; padding-top: 26px; }
+  .sub { font-size: 14px; }
+  .summon { padding: 15px 30px; font-size: 17.5px; }
+  .caption .name { font-size: 18px; }
+}
+
+/* short landscape phones: keep the button on screen */
+@media (max-height: 620px) and (orientation: landscape) {
+  main { max-width: 780px; }
+  header { display: none; }
+  .plate-inner { aspect-ratio: 16 / 9; max-height: 44vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caption .note { animation: none; }
+  #collage.drifting,
+  .summon-glow,
+  .lens { animation: none; }
+  .plate, .plate.arriving .plate-inner > video { transition: none; animation: none; }
+}
